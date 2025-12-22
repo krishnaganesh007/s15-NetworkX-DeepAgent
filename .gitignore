@@ -9,6 +9,22 @@ venv/
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+*.zip
+*.tar
+*.gz
 
 # Mac
 .DS_Store
