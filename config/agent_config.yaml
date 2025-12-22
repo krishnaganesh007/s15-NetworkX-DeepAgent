@@ -7,7 +7,7 @@ agents:
     description: "Generates the execution plan graph."
 
   BrowserAgent:
-    prompt_file: "16_NetworkX/prompts/decision.md"
+    prompt_file: "16_NetworkX/prompts/browser.md"
     model: "gemini"
     mcp_servers: ["browser"]
     description: "Browses the web using text search or vision."
@@ -19,10 +19,10 @@ agents:
     description: "Writes Python code to analyze data or solve problems."
 
   RetrieverAgent:
-    prompt_file: "16_NetworkX/prompts/decision.md"
+    prompt_file: "16_NetworkX/prompts/retriever.md"
     model: "gemini"
-    mcp_servers: ["rag"]
-    description: "Searches local documents."
+    mcp_servers: ["rag", "browser"]
+    description: "Searches local documents and web."
 
   SummarizerAgent:
     prompt_file: "16_NetworkX/prompts/summarizer.md"
