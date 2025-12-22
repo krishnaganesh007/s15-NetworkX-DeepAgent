@@ -31,7 +31,32 @@ agents:
     description: "Synthesizes final answers."
 
   DistillerAgent:
-    prompt_file: "16_NetworkX/prompts/decision.md"
+    prompt_file: "16_NetworkX/prompts/distiller.md"
     model: "gemini"
     mcp_servers: []
-    description: "Profiles and distills file content."
+    description: "Distills complex content into structured summaries."
+
+  ThinkerAgent:
+    prompt_file: "16_NetworkX/prompts/thinker.md"
+    model: "gemini"
+    mcp_servers: []
+    description: "Reasoning and logical inference engine."
+
+  FormatterAgent:
+    prompt_file: "16_NetworkX/prompts/formatter.md"
+    model: "gemini"
+    mcp_servers: []
+    description: "Formats final reports to high standards."
+
+  ClarificationAgent:
+    prompt_file: "16_NetworkX/prompts/clarification.md"
+    model: "gemini"
+    mcp_servers: []
+    description: "Interacts with user for clarifications."
+
+  QAAgent:
+    prompt_file: "16_NetworkX/prompts/qa.md"
+    model: "gemini"
+    mcp_servers: []
+    description: "Quality assurance and validation."
+

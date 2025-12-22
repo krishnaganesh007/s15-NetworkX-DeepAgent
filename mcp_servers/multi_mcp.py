@@ -69,6 +69,45 @@ class MultiMCP:
         print("[bold yellow]🛑 Stopping MCP Servers...[/bold yellow]")
         await self.exit_stack.aclose()
 
+    def get_all_tools(self) -> list:
+        """Get all tools from all connected servers"""
+        all_tools = []
+        for tools in self.tools.values():
+            all_tools.extend(tools)
+        return all_tools
+
+    async def function_wrapper(self, tool_name: str, *args):
+        """Execute a tool using positional arguments by mapping them to schema keys"""
+        # Find tool definition
+        target_tool = None
+        for tools in self.tools.values():
+            for tool in tools:
+                if tool.name == tool_name:
+                    target_tool = tool
+                    break
+            if target_tool: break
+        
+        if not target_tool:
+            return f"Error: Tool {tool_name} not found"
+
+        # Map positional args to keyword args based on schema
+        arguments = {}
+        schema = target_tool.inputSchema
+        if schema and 'properties' in schema:
+            keys = list(schema['properties'].keys())
+            for i, arg in enumerate(args):
+                if i < len(keys):
+                    arguments[keys[i]] = arg
+        
+        try:
+            result = await self.route_tool_call(tool_name, arguments)
+            # Unpack CallToolResult
+            if hasattr(result, 'content') and result.content:
+                return result.content[0].text
+            return str(result)
+        except Exception as e:
+            return f"Error executing {tool_name}: {str(e)}"
+
     def get_tools_from_servers(self, server_names: list) -> list:
         """Get flattened list of tools from requested servers"""
         all_tools = []
