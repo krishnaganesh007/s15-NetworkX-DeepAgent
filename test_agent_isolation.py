@@ -23,16 +23,16 @@ async def main():
         
         # 3. Definte Input
         task = {
-            "step_id": "TEST_001",
-            "agent_prompt": "Calculate the value of sin(0.5) + cos(0.2). Use Python. Print the result.",
+            "step_id": "TEST_RETRIEVER_01",
+            "agent_prompt": "Find recent news about Agentic AI frameworks released in 2024.",
             "reads": [],
-            "writes": ["result"],
+            "writes": ["ai_news_results"],
             "inputs": {}
         }
         
         # 4. Run Agent
-        print(f"🤖 Invoking CoderAgent with task: {task['agent_prompt']}")
-        result = await runner.run_agent("CoderAgent", task)
+        print(f"🤖 Invoking RetrieverAgent with task: {task['agent_prompt']}")
+        result = await runner.run_agent("RetrieverAgent", task)
         
         # 5. Output Result
         if result["success"]:
