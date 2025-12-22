@@ -37,8 +37,9 @@ You must return this JSON:
 - Do **not** use `def` main() or `if __name__ == "__main__"`. Just write script code.
 - Every block must end with a `return { ... }` containing named outputs.
 - Access prior step variables directly (e.g., `if some_var:`), never via `globals_schema.get(...)` (they are injected).
-- **Use standard libraries**: `math`, `datetime`, `json`, `re`, `random`.
-- **Data Science**: `numpy`, `pandas` are available.
+- **Use standard libraries**: `math`, `datetime`, `json`, `re`, `random`, `urllib`, `collections`.
+- **Data Science**: `numpy`, `pandas` are GUARANTEED.
+- **RESTRICTION**: Do not import `requests`, `yfinance`, `beautifulsoup4`, or other external PyPI packages unless you are certain they are installed. Prefer standard libraries or tools for fetching data.
 
 ---
 
