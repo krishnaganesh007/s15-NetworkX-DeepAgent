@@ -130,7 +130,9 @@ from pathlib import Path
 from datetime import datetime
 from rich import print
 
-def get_log_folder(session_id: str, base_dir: str = "memory/session_logs") -> Path:
+def get_log_folder(session_id: str, base_dir: str = None) -> Path:
+    if base_dir is None:
+        base_dir = Path(__file__).parent.parent / "memory" / "session_logs"
     now = datetime.now()
     folder = Path(base_dir) / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}"
     folder.mkdir(parents=True, exist_ok=True)
@@ -142,7 +144,7 @@ def save_json_log(obj: dict, path: Path):
         json.dump(obj, f, indent=2)
     print(f"\n\n[green]📝 Saved JSON log:[/green] {path}\n")
 
-def append_step_log(session_id: str, step_data: dict, base_dir: str = "memory/session_logs"):
+def append_step_log(session_id: str, step_data: dict, base_dir: str = None):
     folder = get_log_folder(session_id, base_dir)
     step_path = folder / f"{session_id}_steps.json"
     if step_path.exists():
@@ -156,7 +158,7 @@ def append_step_log(session_id: str, step_data: dict, base_dir: str = "memory/se
         json.dump(logs, f, indent=2)
     print(f"[cyan]🔄 Step log updated:[/cyan] {step_path}")
 
-def save_final_plan(session_id: str, final_data: dict, base_dir: str = "memory/session_logs"):
+def save_final_plan(session_id: str, final_data: dict, base_dir: str = None):
     folder = get_log_folder(session_id, base_dir)
     plan_path = folder / f"{session_id}.json"
     save_json_log(final_data, plan_path)

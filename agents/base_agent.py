@@ -87,7 +87,7 @@ class AgentRunner:
             print(f"🛠️ [DEBUG] Generated Tools Text for {agent_type}:\n{tools_text}\n")
 
             # 📝 LOGGING: Save prompt to file for debugging
-            debug_log_dir = Path("memory/debug_logs")
+            debug_log_dir = Path(__file__).parent.parent / "memory" / "debug_logs"
             debug_log_dir.mkdir(parents=True, exist_ok=True)
             (debug_log_dir / "latest_prompt.txt").write_text(f"AGENT: {agent_type}\nCONFIG: {config['prompt_file']}\n\n{full_prompt}", encoding="utf-8")
             log_step(f"🤖 {agent_type} invoked", payload={"prompt_file": config['prompt_file'], "input_keys": list(input_data.keys())}, symbol="🟦")

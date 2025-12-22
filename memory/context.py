@@ -469,7 +469,7 @@ class ExecutionContextManager:
 
     def _save_session(self):
         """Save the NetworkX graph as session"""
-        base_dir = Path("memory/session_summaries_index")
+        base_dir = Path(__file__).parent.parent / "memory" / "session_summaries_index"
         today = datetime.now()
         date_dir = base_dir / str(today.year) / f"{today.month:02d}" / f"{today.day:02d}"
         date_dir.mkdir(parents=True, exist_ok=True)
