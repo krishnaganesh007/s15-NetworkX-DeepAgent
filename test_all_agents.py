@@ -82,7 +82,7 @@ async def main():
             "agent_prompt": "Calculate the factorial of 5 using Python and print it.",
             "reads": [], "writes": ["factorial_result"],
             "inputs": {}
-        }, expected_key="call_tool") # OR code_variants depending on prompt. My prompt uses call_tool.
+        }, expected_key="code_variants")
 
         # 3. RETRIEVER (Browser)
         await run_test(runner, "RetrieverAgent", {
