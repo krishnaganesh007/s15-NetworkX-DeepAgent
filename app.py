@@ -41,7 +41,7 @@ async def main():
     args = parser.parse_args()
 
     console = Console()
-    console.print(Panel.fit("[bold cyan]S16 NetworkX Agent System[/bold cyan]", border_style="blue"))
+    console.print(Panel.fit("[bold cyan]S15 NetworkX Agent System[/bold cyan]", border_style="blue"))
 
     # 1. Start MCP Servers
     multi_mcp = MultiMCP()
@@ -91,7 +91,7 @@ async def main():
 
             demo = gr.ChatInterface(
                 fn=chat_fn,
-                title="S16 NetworkX Agent",
+                title="S15 NetworkX Agent",
                 description="Ask complex questions. The agent will plan, browse, code, and summarize.",
             )
             print("[bold green]Starting UI on http://localhost:7860[/bold green]")

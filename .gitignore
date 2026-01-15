@@ -25,6 +25,7 @@ pip-delete-this-directory.txt
 *.zip
 *.tar
 *.gz
+.env
 
 # Mac
 .DS_Store
@@ -48,6 +49,10 @@ mcp_servers/documents/*.xls
 mcp_servers/documents/*.zip
 mcp_servers/documents/*.tar
 mcp_servers/documents/*.gz
+
+## Ignore SandboxState files
+action/sandbox_state/
+
 
 # Retain keep files if necessary (optional strategy)
 # !mcp_servers/documents/.gitkeep

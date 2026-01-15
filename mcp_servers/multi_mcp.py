@@ -17,15 +17,15 @@ class MultiMCP:
         self.server_configs = {
             "browser": {
                 "command": "uv",
-                "args": ["run", "16_NetworkX/mcp_servers/server_browser.py"],
+                "args": ["run", "mcp_servers/server_browser.py"],
             },
             "rag": {
                 "command": "uv",
-                "args": ["run", "16_NetworkX/mcp_servers/server_rag.py"],
+                "args": ["run", "mcp_servers/server_rag.py"],
             },
             "sandbox": {
                 "command": "uv",
-                "args": ["run", "16_NetworkX/mcp_servers/server_sandbox.py"],
+                "args": ["run", "mcp_servers/server_sandbox.py"],
             }
         }
 

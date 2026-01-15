@@ -38,13 +38,13 @@ This version replaces the manual graph management with a robust DAG structure an
 
 ### Interactive Mode
 ```bash
-uv run 16_NetworkX/app.py
+uv run app.py
 ```
 Type your query (e.g., "Plan a 3 day trip to Tokyo").
 
 ### Automated Test
 ```bash
-uv run 16_NetworkX/test_run.py
+uv run test_run.py
 ```
 
 ## 🛠️ Configuration
