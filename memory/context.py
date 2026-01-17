@@ -57,6 +57,46 @@ class ExecutionContextManager:
         self.debug_mode = debug_mode
         self._live_display = None
 
+    def update_plan(self, plan_graph: dict):
+        """Update the graph with a new plan (replacing structure but keeping metadata)"""
+        # Keep metadata and existing globals
+        graph_data = self.plan_graph.graph
+        
+        # Rebuild graph
+        self.plan_graph = nx.DiGraph()
+        self.plan_graph.graph = graph_data
+        
+        # Add ROOT node
+        self.plan_graph.add_node("ROOT",
+            description="Initial Query",
+            agent="System", 
+            status='completed',
+            output=None,
+            error=None,
+            cost=0.0,
+            start_time=None,
+            end_time=None,
+            execution_time=0.0
+        )
+
+        # Build plan DAG
+        for node in plan_graph.get("nodes", []):
+            self.plan_graph.add_node(node["id"], 
+                **node,
+                status='pending',
+                output=None,
+                error=None,
+                cost=0.0,
+                start_time=None,
+                end_time=None,
+                execution_time=0.0
+            )
+            
+        for edge in plan_graph.get("edges", []):
+            self.plan_graph.add_edge(edge["source"], edge["target"])
+            
+        self._auto_save()
+
     def get_ready_steps(self):
         """Return all steps whose dependencies are complete and not yet run."""
         ready = []
@@ -363,6 +403,19 @@ class ExecutionContextManager:
         """Get all step data from graph"""
         return self.plan_graph.nodes[step_id]
 
+    def _ensure_parsed_value(self, value):
+        """Helper to ensure strings resembling lists/dicts are parsed"""
+        if isinstance(value, str):
+            try:
+                # Try to see if it's a list/dict wrapped in a string
+                cleaned = value.strip()
+                if cleaned.startswith(('[', '{')):
+                    import ast
+                    return ast.literal_eval(cleaned)
+            except Exception:
+                pass
+        return value
+
     def get_inputs(self, reads):
         """Get input data from graph globals_schema"""
         inputs = {}
@@ -370,7 +423,7 @@ class ExecutionContextManager:
         
         for read_key in reads:
             if read_key in globals_schema:
-                inputs[read_key] = globals_schema[read_key]
+                inputs[read_key] = self._ensure_parsed_value(globals_schema[read_key])
             else:
                 print(f"⚠️  Missing dependency: '{read_key}' not found in globals_schema")
                 print(f"📋 Available keys: {list(globals_schema.keys())}")

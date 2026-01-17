@@ -18,6 +18,31 @@ class AgentLoop4:
         self.agent_runner = AgentRunner(multi_mcp)
 
     async def run(self, query, file_manifest, globals_schema, uploaded_files):
+        # 0. BOOTSTRAP: Create immediate graph for UI
+        bootstrap_plan = {
+            "nodes": [{
+                "id": "Planning",
+                "agent": "PlannerAgent",
+                "description": "Structuring the execution plan...",
+                "reads": [],
+                "writes": []
+            }],
+            "edges": []
+        }
+        
+        context = ExecutionContextManager(
+            bootstrap_plan,
+            session_id=None,
+            original_query=query,
+            file_manifest=file_manifest
+        )
+        context.multi_mcp = self.multi_mcp
+        context.plan_graph.graph['globals_schema'].update(globals_schema)
+        
+        # Mark Planning as running (visually)
+        if "Planning" in context.plan_graph:
+            context.mark_running("Planning")
+
         # Phase 1: File Profiling (if files exist)
         file_profiles = {}
         if uploaded_files:
@@ -46,32 +71,29 @@ class AgentLoop4:
         )
 
         if not plan_result["success"]:
+            # Mark planning failed in context
+            context.mark_failed("Planning", plan_result['error'])
             raise RuntimeError(f"Planning failed: {plan_result['error']}")
 
         # Check if plan_graph exists
         if 'plan_graph' not in plan_result['output']:
+            context.mark_failed("Planning", "PlannerAgent output missing 'plan_graph' key")
             raise RuntimeError(f"PlannerAgent output missing 'plan_graph' key. Got: {list(plan_result['output'].keys())}")
         
         plan_graph = plan_result["output"]["plan_graph"]
 
         try:
-            # Phase 3: 100% NetworkX Graph-First Execution
-            context = ExecutionContextManager(
-                plan_graph,
-                session_id=None,
-                original_query=query,
-                file_manifest=file_manifest
-            )
+            # Phase 3: Update Context with REAL Plan (Keep ID, etc)
+            context.update_plan(plan_graph)
             
-            # Add multi_mcp reference
-            context.multi_mcp = self.multi_mcp
-            
-            # Initialize graph with file profiles and globals
+            # Re-initialize graph with file profiles (since update_plan clears attributes logic dependent on graph structure, but update_plan keeps globals)
             context.set_file_profiles(file_profiles)
-            context.plan_graph.graph['globals_schema'].update(globals_schema)
-
+            
             # Phase 4: Execute DAG with visualization
             await self._execute_dag(context)
+
+            # Phase 5: Return the CONTEXT OBJECT, not summary
+            return context
 
             # Phase 5: Return the CONTEXT OBJECT, not summary
             return context
