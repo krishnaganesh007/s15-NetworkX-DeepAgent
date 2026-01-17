@@ -1,0 +1,25 @@
+{
+    "mcpServers": {
+        "browser": {
+            "command": "uv",
+            "args": [
+                "run",
+                "mcp_servers/server_browser.py"
+            ]
+        },
+        "rag": {
+            "command": "uv",
+            "args": [
+                "run",
+                "mcp_servers/server_rag.py"
+            ]
+        },
+        "sandbox": {
+            "command": "uv",
+            "args": [
+                "run",
+                "mcp_servers/server_sandbox.py"
+            ]
+        }
+    }
+}
