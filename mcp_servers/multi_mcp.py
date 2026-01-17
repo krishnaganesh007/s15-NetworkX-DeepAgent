@@ -16,6 +16,7 @@ class MultiMCP:
         self.sessions = {}  # server_name -> session
         self.tools = {}     # server_name -> [Tool]
         self.config_path = config_path
+        self.cache = self._load_cache() # Initialize cache
         self.server_configs = self._load_config()
 
     def _load_config(self):
@@ -138,18 +139,64 @@ class MultiMCP:
         return all_tools
 
     async def call_tool(self, server_name: str, tool_name: str, arguments: dict):
-        """Call a tool on a specific server with S20 Timeout Fix"""
+        """Call a tool on a specific server with S20 Timeout Fix & Caching"""
         if server_name not in self.sessions:
             raise ValueError(f"Server '{server_name}' not connected")
         
+        # 1. Check Cache
+        cache_key = f"{server_name}:{tool_name}:{json.dumps(arguments, sort_keys=True)}"
+        if self._is_cacheable(tool_name) and cache_key in self.cache:
+            print(f"  ⚡ [dim]Served {tool_name} from cache[/dim]")
+            # Reconstruct a simple object that mimics CallToolResult
+            cached_text = self.cache[cache_key]
+            
+            class CachedResult:
+                class Content:
+                    def __init__(self, text): self.text = text
+                def __init__(self, text): self.content = [self.Content(text)]
+            
+            return CachedResult(cached_text)
+
         # S20 Fix: Enforce 20s timeout per tool call
         try:
-            return await asyncio.wait_for(
+            result = await asyncio.wait_for(
                 self.sessions[server_name].call_tool(tool_name, arguments),
                 timeout=20.0 # Prevent infinite hangs
             )
+            
+            # 2. Update Cache
+            if self._is_cacheable(tool_name):
+                # Extract text content safely
+                if hasattr(result, 'content') and result.content:
+                    text_content = result.content[0].text
+                    self.cache[cache_key] = text_content
+                    self._save_cache()
+            
+            return result
+            
         except asyncio.TimeoutError:
             raise TimeoutError(f"Tool '{tool_name}' on server '{server_name}' timed out after 20 seconds.")
+
+    def _is_cacheable(self, tool_name):
+        """Heuristic for cacheable tools"""
+        safe_prefixes = ['search', 'fetch', 'read', 'get', 'list', 'browse']
+        return any(tool_name.startswith(p) for p in safe_prefixes)
+
+    def _load_cache(self):
+        """Load cache from disk"""
+        path = Path("mcp_cache.json")
+        if path.exists():
+            try:
+                with open(path, 'r') as f: return json.load(f)
+            except: return {}
+        return {}
+
+    def _save_cache(self):
+        """Save cache to disk"""
+        try:
+            with open("mcp_cache.json", 'w') as f: json.dump(self.cache, f, indent=2)
+        except Exception as e:
+            print(f"[dim]Failed to save cache: {e}[/dim]")
 
     # Helper to route tool call by finding which server has it
     async def route_tool_call(self, tool_name: str, arguments: dict):
