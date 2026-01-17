@@ -301,7 +301,12 @@ class ExecutionContextManager:
             try:
                 user_response = self._handle_user_interaction_rich(output)
                 writes_to = output.get("writes_to", "user_response")
-                self.plan_graph.graph['globals_schema'][writes_to] = user_response
+                
+                # Capture rich context (Question + Answer)
+                question = output.get("clarificationMessage", "System asked for input")
+                rich_context = f"Agent Asked: {question}\nUser Said: {user_response}"
+                
+                self.plan_graph.graph['globals_schema'][writes_to] = rich_context
                 
                 output = output.copy()
                 output["user_response"] = user_response
